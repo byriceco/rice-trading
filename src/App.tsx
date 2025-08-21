@@ -4,6 +4,7 @@ import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { Dashboard } from './components/dashboard/Dashboard';
 import { Suppliers } from './components/procurement/Suppliers';
+import { SupplierFormPage } from './components/procurement/SupplierFormPage';
 import { PurchaseOrders } from './components/procurement/PurchaseOrders';
 import { Inventory } from './components/inventory/Inventory';
 import { StockTransfers } from './components/inventory/StockTransfers';
@@ -39,6 +40,7 @@ function AppContent() {
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/suppliers" element={<Suppliers />} />
+              <Route path="/suppliers/new" element={<SupplierFormPage />} />
               <Route path="/purchase-orders" element={<PurchaseOrders />} />
               <Route path="/inventory" element={<Inventory />} />
               <Route path="/stock-transfers" element={<StockTransfers />} />

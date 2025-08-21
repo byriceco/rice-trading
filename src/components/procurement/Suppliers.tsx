@@ -1,10 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import { Plus, Edit2, Phone, Mail, MapPin, Check, X, Users, DollarSign, ArrowUpDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useData } from '../../contexts/DataContext';
 import type { Supplier } from '../../contexts/DataContext';
 
 export function Suppliers() {
   const { suppliers, addSupplier, updateSupplier } = useData();
+  const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -212,10 +214,7 @@ export function Suppliers() {
               List
             </button>
           </div>
-          <button
-            onClick={() => setShowForm(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center"
-          >
+          <button onClick={() => navigate('/suppliers/new')} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center">
             <Plus className="w-4 h-4 mr-2" />
             Add Supplier
           </button>
@@ -273,7 +272,7 @@ export function Suppliers() {
         />
       </div>
 
-      {/* Supplier Form Modal */}
+      {/* Supplier Form Modal (kept for Edit only) */}
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-6 w-full max-w-3xl shadow-xl border border-gray-200">
