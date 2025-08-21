@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Plus, Search, Filter, Edit2, Eye, Download, CheckCircle } from 'lucide-react';
+import { Plus, Search, Filter, Edit2, Eye, Download, CheckCircle, ShoppingCart } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
 import type { PurchaseOrder } from '../../contexts/DataContext';
 
