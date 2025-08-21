@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { 
   Package, 
   Users, 
@@ -57,6 +57,19 @@ export function Dashboard() {
       color: 'orange'
     }
   ];
+
+  const chartSeries = useMemo(() => {
+    const byDate: Record<string, { date: string; sales: number; purchases: number }> = {};
+    salesOrders.forEach((o) => {
+      if (!byDate[o.date]) byDate[o.date] = { date: o.date, sales: 0, purchases: 0 };
+      byDate[o.date].sales += o.totalAmount;
+    });
+    purchaseOrders.forEach((o) => {
+      if (!byDate[o.date]) byDate[o.date] = { date: o.date, sales: 0, purchases: 0 };
+      byDate[o.date].purchases += o.totalAmount;
+    });
+    return Object.values(byDate).sort((a, b) => a.date.localeCompare(b.date)).slice(-14);
+  }, [salesOrders, purchaseOrders]);
 
   return (
     <div className="space-y-6">
@@ -169,6 +182,15 @@ export function Dashboard() {
         </div>
       </div>
 
+      {/* Sales vs Purchases */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Sales vs Purchases (last 14 days)</h2>
+        <div className="w-full h-64">
+          {/* @ts-ignore */}
+          <SalesPurchasesChart data={chartSeries} />
+        </div>
+      </div>
+
       {/* Recent Activity */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
@@ -203,3 +225,21 @@ export function Dashboard() {
     </div>
   );
 }
+
+const SalesPurchasesChart = ({ data }: { data: Array<{ date: string; sales: number; purchases: number }> }) => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend } = require('recharts');
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <LineChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+        <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+        <YAxis tick={{ fontSize: 12 }} />
+        <Tooltip />
+        <Legend />
+        <Line type="monotone" dataKey="sales" stroke="#2563eb" name="Sales" dot={false} />
+        <Line type="monotone" dataKey="purchases" stroke="#f59e0b" name="Purchases" dot={false} />
+      </LineChart>
+    </ResponsiveContainer>
+  );
+};

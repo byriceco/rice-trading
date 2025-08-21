@@ -14,6 +14,7 @@ export function Suppliers() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(9);
   const [sortKey, setSortKey] = useState<'name_asc' | 'balance_desc' | 'status_active'>('name_asc');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [formData, setFormData] = useState({
     name: '',
     supplierCode: '',
@@ -109,8 +110,10 @@ export function Suppliers() {
   };
 
   const filteredSuppliers = useMemo(() => {
-    return suppliers.filter((s) => doesSupplierMatchSearch(s, searchTerm));
-  }, [suppliers, searchTerm]);
+    return suppliers
+      .filter((s) => doesSupplierMatchSearch(s, searchTerm))
+      .filter((s) => (statusFilter === 'all' ? true : s.status === statusFilter));
+  }, [suppliers, searchTerm, statusFilter]);
 
   const sortedSuppliers = useMemo(() => {
     const copy = [...filteredSuppliers];
@@ -184,6 +187,16 @@ export function Suppliers() {
               </svg>
             </div>
           </div>
+          <select
+            value={statusFilter}
+            onChange={(e) => { setStatusFilter(e.target.value as any); setCurrentPage(1); }}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-sm"
+            title="Filter by status"
+          >
+            <option value="all">All</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
           <div className="hidden md:flex items-center gap-2">
             <div className="relative">
               <ArrowUpDown className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />

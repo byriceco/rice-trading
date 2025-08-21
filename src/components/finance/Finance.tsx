@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { DollarSign, Plus, TrendingUp, TrendingDown, CreditCard, Wallet } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
 import type { Transaction } from '../../contexts/DataContext';
@@ -46,6 +46,17 @@ export function Finance() {
   };
 
   const recentTransactions = transactions.slice(-10).reverse();
+
+  const dailySeries = useMemo(() => {
+    const byDate: Record<string, { date: string; income: number; expense: number }> = {};
+    transactions.forEach((t) => {
+      if (!byDate[t.date]) byDate[t.date] = { date: t.date, income: 0, expense: 0 };
+      if (t.type === 'income') byDate[t.date].income += t.amount;
+      else byDate[t.date].expense += t.amount;
+    });
+    const series = Object.values(byDate).sort((a, b) => a.date.localeCompare(b.date));
+    return series.slice(-14);
+  }, [transactions]);
 
   return (
     <div className="space-y-6">
@@ -101,6 +112,16 @@ export function Finance() {
             </div>
             <Wallet className="w-8 h-8 text-blue-600" />
           </div>
+        </div>
+      </div>
+
+      {/* Trend Chart */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Income vs Expense (last 14 days)</h3>
+        <div className="w-full h-64">
+          {/* Lazy import to avoid SSR issues */}
+          {/* @ts-ignore */}
+          <FinanceChart data={dailySeries} />
         </div>
       </div>
 
@@ -351,3 +372,33 @@ export function Finance() {
     </div>
   );
 }
+
+// Inline chart component to keep file count low
+const FinanceChart = ({ data }: { data: Array<{ date: string; income: number; expense: number }> }) => {
+  // Import inside to avoid breaking build if recharts tree-shaking changes
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, Legend } = require('recharts');
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <AreaChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+        <defs>
+          <linearGradient id="income" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#16a34a" stopOpacity={0.4} />
+            <stop offset="95%" stopColor="#16a34a" stopOpacity={0} />
+          </linearGradient>
+          <linearGradient id="expense" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#dc2626" stopOpacity={0.4} />
+            <stop offset="95%" stopColor="#dc2626" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+        <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+        <YAxis tick={{ fontSize: 12 }} />
+        <Tooltip />
+        <Legend />
+        <Area type="monotone" dataKey="income" stroke="#16a34a" fillOpacity={1} fill="url(#income)" name="Income" />
+        <Area type="monotone" dataKey="expense" stroke="#dc2626" fillOpacity={1} fill="url(#expense)" name="Expense" />
+      </AreaChart>
+    </ResponsiveContainer>
+  );
+};
