@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { ArrowLeft, Calculator, Info, CreditCard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useData } from '../../contexts/DataContext';
 
@@ -36,22 +37,60 @@ export function PurchaseOrderFormPage() {
     e.preventDefault();
     const supplier = suppliers.find((s) => s.id === formData.supplierId);
     if (!supplier) return;
+    const paymentStatus = formData.paidAmount >= totalAmount ? 'paid' : (formData.paidAmount > 0 ? 'partial' : 'pending');
     addPurchaseOrder({
       ...formData,
       supplierName: supplier.name,
       totalAmount,
+      paymentStatus,
     });
     navigate('/purchase-orders');
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Create Purchase Order</h1>
-        <button onClick={() => navigate(-1)} className="px-3 py-2 text-gray-600 hover:text-gray-900">Back</button>
+        <button onClick={() => navigate(-1)} className="inline-flex items-center px-3 py-2 text-gray-600 hover:text-gray-900">
+          <ArrowLeft className="w-4 h-4 mr-2" /> Back
+        </button>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Top summary */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <p className="text-sm text-gray-600">Total Amount</p>
+            <p className="mt-1 text-2xl font-bold text-gray-900">৳{totalAmount.toLocaleString()}</p>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <p className="text-sm text-gray-600">Paid Amount</p>
+            <div className="mt-1 relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">৳</span>
+              <input
+                type="number"
+                value={formData.paidAmount}
+                onChange={(e) => setFormData({ ...formData, paidAmount: Number(e.target.value) })}
+                className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                min={0}
+                max={totalAmount}
+              />
+            </div>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <p className="text-sm text-gray-600">Payment Status</p>
+            <p className="mt-1 text-lg font-semibold">
+              {formData.paidAmount >= totalAmount ? (
+                <span className="text-green-600">Paid</span>
+              ) : formData.paidAmount > 0 ? (
+                <span className="text-blue-600">Partial</span>
+              ) : (
+                <span className="text-orange-600">Pending</span>
+              )}
+            </p>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-4">
             <h3 className="text-sm font-semibold text-gray-700">Supplier & Date</h3>
@@ -70,6 +109,24 @@ export function PurchaseOrderFormPage() {
                 <input type="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required />
               </div>
             </div>
+            {/* Supplier preview */}
+            {formData.supplierId && (
+              <div className="flex items-start gap-3 text-sm bg-gray-50 border border-gray-200 rounded-lg p-3">
+                <Info className="w-4 h-4 text-gray-500 mt-0.5" />
+                <div className="text-gray-700">
+                  {(() => {
+                    const s = suppliers.find(s => s.id === formData.supplierId);
+                    return s ? (
+                      <>
+                        <div className="font-medium text-gray-900">{s.name}</div>
+                        <div className="text-gray-600">{s.contact} • {s.phone}</div>
+                        <div className="text-gray-500">{s.address}</div>
+                      </>
+                    ) : null;
+                  })()}
+                </div>
+              </div>
+            )}
           </section>
 
           <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-4">
@@ -103,24 +160,52 @@ export function PurchaseOrderFormPage() {
                 <input type="number" value={formData.weightKg} onChange={(e) => setFormData({ ...formData, weightKg: Number(e.target.value) })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Price per kg (৳)</label>
-                <input type="number" step="0.01" value={formData.pricePerKg} onChange={(e) => setFormData({ ...formData, pricePerKg: Number(e.target.value) })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required />
+                <label className="block text-sm font-medium text-gray-700 mb-1">Price per kg</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">৳</span>
+                  <input type="number" step="0.01" value={formData.pricePerKg} onChange={(e) => setFormData({ ...formData, pricePerKg: Number(e.target.value) })} className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required />
+                </div>
               </div>
             </div>
           </section>
         </div>
 
-        <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-2">
-          <h3 className="text-sm font-semibold text-gray-700">Summary</h3>
-          <div className="flex items-center justify-between">
-            <span className="text-gray-600">Total Amount</span>
-            <span className="text-xl font-semibold text-gray-900">৳{totalAmount.toLocaleString()}</span>
+        <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+          <h3 className="text-sm font-semibold text-gray-700 flex items-center"><Calculator className="w-4 h-4 mr-2" /> Summary</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+            <div className="flex items-center justify-between bg-gray-50 rounded-lg p-3 border border-gray-100">
+              <span className="text-gray-600">Bags × Bag Size</span>
+              <span className="font-medium text-gray-900">{formData.quantity} × {formData.bagSize}kg</span>
+            </div>
+            <div className="flex items-center justify-between bg-gray-50 rounded-lg p-3 border border-gray-100">
+              <span className="text-gray-600">Total Weight</span>
+              <span className="font-medium text-gray-900">{formData.weightKg} kg</span>
+            </div>
+            <div className="flex items-center justify-between bg-gray-50 rounded-lg p-3 border border-gray-100">
+              <span className="text-gray-600">Price per kg</span>
+              <span className="font-medium text-gray-900">৳{formData.pricePerKg}</span>
+            </div>
+            <div className="flex items-center justify-between bg-gray-50 rounded-lg p-3 border border-gray-100">
+              <span className="text-gray-600">Total Amount</span>
+              <span className="font-semibold text-gray-900">৳{totalAmount.toLocaleString()}</span>
+            </div>
           </div>
         </section>
 
-        <div className="flex justify-end gap-3">
-          <button type="button" onClick={() => navigate('/purchase-orders')} className="px-4 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
-          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Save Order</button>
+        <div className="flex justify-between items-center gap-3">
+          <div className="text-sm text-gray-500 inline-flex items-center">
+            <CreditCard className="w-4 h-4 mr-1" /> Payment status is set based on paid amount.
+          </div>
+          <div className="flex gap-3">
+            <button type="button" onClick={() => navigate('/purchase-orders')} className="px-4 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
+            <button
+              type="submit"
+              disabled={!formData.supplierId || !formData.date || formData.quantity <= 0 || formData.bagSize <= 0 || formData.weightKg <= 0 || formData.pricePerKg <= 0}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Save Order
+            </button>
+          </div>
         </div>
       </form>
     </div>
