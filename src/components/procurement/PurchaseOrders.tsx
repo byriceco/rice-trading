@@ -1,10 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import { Plus, Search, Filter, Edit2, Eye, Download, CheckCircle, ShoppingCart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useData } from '../../contexts/DataContext';
 import type { PurchaseOrder } from '../../contexts/DataContext';
 
 export function PurchaseOrders() {
   const { purchaseOrders, suppliers, addPurchaseOrder, updatePurchaseOrder } = useData();
+  const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -204,12 +206,8 @@ export function PurchaseOrders() {
           <button onClick={exportCSV} className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center text-sm">
             <Download className="w-4 h-4 mr-2" /> Export CSV
           </button>
-          <button
-            onClick={() => setShowForm(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Create Purchase Order
+          <button onClick={() => navigate('/purchase-orders/new')} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center">
+            <Plus className="w-4 h-4 mr-2" /> Create Purchase Order
           </button>
         </div>
       </div>

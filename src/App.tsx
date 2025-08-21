@@ -6,6 +6,7 @@ import { Dashboard } from './components/dashboard/Dashboard';
 import { Suppliers } from './components/procurement/Suppliers';
 import { SupplierFormPage } from './components/procurement/SupplierFormPage';
 import { PurchaseOrders } from './components/procurement/PurchaseOrders';
+import { PurchaseOrderFormPage } from './components/procurement/PurchaseOrderFormPage';
 import { Inventory } from './components/inventory/Inventory';
 import { StockTransfers } from './components/inventory/StockTransfers';
 import { Customers } from './components/sales/Customers';
@@ -42,6 +43,7 @@ function AppContent() {
               <Route path="/suppliers" element={<Suppliers />} />
               <Route path="/suppliers/new" element={<SupplierFormPage />} />
               <Route path="/purchase-orders" element={<PurchaseOrders />} />
+              <Route path="/purchase-orders/new" element={<PurchaseOrderFormPage />} />
               <Route path="/inventory" element={<Inventory />} />
               <Route path="/stock-transfers" element={<StockTransfers />} />
               <Route path="/customers" element={<Customers />} />
