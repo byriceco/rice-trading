@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Plus, Edit2, Phone, Mail, MapPin, Check, X } from 'lucide-react';
+import { Plus, Edit2, Phone, Mail, MapPin, Check, X, Users, DollarSign, ArrowUpDown } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
 import type { Supplier } from '../../contexts/DataContext';
 
@@ -11,6 +11,7 @@ export function Suppliers() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(9);
+  const [sortKey, setSortKey] = useState<'name_asc' | 'balance_desc' | 'status_active'>('name_asc');
   const [formData, setFormData] = useState({
     name: '',
     contact: '',
@@ -76,11 +77,34 @@ export function Suppliers() {
     return suppliers.filter((s) => doesSupplierMatchSearch(s, searchTerm));
   }, [suppliers, searchTerm]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredSuppliers.length / pageSize));
+  const sortedSuppliers = useMemo(() => {
+    const copy = [...filteredSuppliers];
+    switch (sortKey) {
+      case 'balance_desc':
+        copy.sort((a, b) => b.balance - a.balance);
+        break;
+      case 'status_active':
+        copy.sort((a, b) => {
+          // Active first, then by name
+          const av = a.status === 'active' ? 0 : 1;
+          const bv = b.status === 'active' ? 0 : 1;
+          if (av !== bv) return av - bv;
+          return a.name.localeCompare(b.name);
+        });
+        break;
+      case 'name_asc':
+      default:
+        copy.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+    }
+    return copy;
+  }, [filteredSuppliers, sortKey]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedSuppliers.length / pageSize));
   const paginatedSuppliers = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
-    return filteredSuppliers.slice(start, start + pageSize);
-  }, [filteredSuppliers, currentPage, pageSize]);
+    return sortedSuppliers.slice(start, start + pageSize);
+  }, [sortedSuppliers, currentPage, pageSize]);
 
   const handleChangePage = (nextPage: number) => {
     const bounded = Math.min(Math.max(1, nextPage), totalPages);
@@ -91,6 +115,20 @@ export function Suppliers() {
     setSearchTerm(value);
     setCurrentPage(1);
   };
+
+  const getInitials = (fullName: string) => {
+    return fullName
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase();
+  };
+
+  const totalSuppliers = suppliers.length;
+  const activeSuppliers = suppliers.filter((s) => s.status === 'active').length;
+  const inactiveSuppliers = suppliers.filter((s) => s.status !== 'active').length;
+  const totalOutstanding = suppliers.reduce((sum, s) => sum + s.balance, 0);
 
   return (
     <div className="space-y-6">
@@ -109,6 +147,20 @@ export function Suppliers() {
               <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-4.35-4.35M10 18a8 8 0 100-16 8 8 0 000 16z" />
               </svg>
+            </div>
+          </div>
+          <div className="hidden md:flex items-center gap-2">
+            <div className="relative">
+              <ArrowUpDown className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <select
+                value={sortKey}
+                onChange={(e) => { setSortKey(e.target.value as any); setCurrentPage(1); }}
+                className="pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-sm"
+              >
+                <option value="name_asc">Sort: Name (A-Z)</option>
+                <option value="balance_desc">Sort: Balance (High → Low)</option>
+                <option value="status_active">Sort: Status (Active first)</option>
+              </select>
             </div>
           </div>
           <div className="flex rounded-lg overflow-hidden border border-gray-300">
@@ -134,6 +186,46 @@ export function Suppliers() {
             <Plus className="w-4 h-4 mr-2" />
             Add Supplier
           </button>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Total Suppliers</p>
+              <p className="text-2xl font-bold text-gray-900">{totalSuppliers}</p>
+            </div>
+            <Users className="w-8 h-8 text-blue-600" />
+          </div>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Active</p>
+              <p className="text-2xl font-bold text-green-600">{activeSuppliers}</p>
+            </div>
+            <Check className="w-8 h-8 text-green-600" />
+          </div>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Inactive</p>
+              <p className="text-2xl font-bold text-red-600">{inactiveSuppliers}</p>
+            </div>
+            <X className="w-8 h-8 text-red-600" />
+          </div>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Outstanding</p>
+              <p className="text-2xl font-bold text-gray-900">৳{totalOutstanding.toLocaleString()}</p>
+            </div>
+            <DollarSign className="w-8 h-8 text-purple-600" />
+          </div>
         </div>
       </div>
 
@@ -253,11 +345,16 @@ export function Suppliers() {
       {viewMode === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {paginatedSuppliers.map((supplier) => (
-            <div key={supplier.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div key={supplier.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start mb-4">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">{supplier.name}</h3>
-                <p className="text-sm text-gray-600">{supplier.contact}</p>
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-semibold">
+                  {getInitials(supplier.name)}
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">{supplier.name}</h3>
+                  <p className="text-sm text-gray-600">{supplier.contact}</p>
+                </div>
               </div>
               <div className="flex items-center space-x-2">
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -269,7 +366,8 @@ export function Suppliers() {
                 </span>
                 <button
                   onClick={() => handleEdit(supplier)}
-                  className="p-1 text-gray-400 hover:text-gray-600"
+                  className="p-1 text-gray-400 hover:text-gray-600 rounded"
+                  title="Edit"
                 >
                   <Edit2 className="w-4 h-4" />
                 </button>
@@ -283,11 +381,11 @@ export function Suppliers() {
               </div>
               <div className="flex items-center text-gray-600">
                 <Phone className="w-4 h-4 mr-2" />
-                <span>{supplier.phone}</span>
+                <a className="hover:underline" href={`tel:${supplier.phone}`}>{supplier.phone}</a>
               </div>
               <div className="flex items-center text-gray-600">
                 <Mail className="w-4 h-4 mr-2" />
-                <span>{supplier.email}</span>
+                <a className="hover:underline" href={`mailto:${supplier.email}`}>{supplier.email}</a>
               </div>
             </div>
 
@@ -297,6 +395,14 @@ export function Suppliers() {
                 <span className="font-semibold text-lg text-red-600">
                   ৳{supplier.balance.toLocaleString()}
                 </span>
+              </div>
+              <div className="mt-3 flex items-center gap-2">
+                <a href={`tel:${supplier.phone}`} className="inline-flex items-center px-3 py-1.5 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                  <Phone className="w-4 h-4 mr-2" /> Call
+                </a>
+                <a href={`mailto:${supplier.email}`} className="inline-flex items-center px-3 py-1.5 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                  <Mail className="w-4 h-4 mr-2" /> Email
+                </a>
               </div>
             </div>
             </div>
@@ -320,10 +426,17 @@ export function Suppliers() {
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedSuppliers.map((supplier) => (
                 <tr key={supplier.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{supplier.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold">
+                        {getInitials(supplier.name)}
+                      </div>
+                      <span>{supplier.name}</span>
+                    </div>
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{supplier.contact}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{supplier.phone}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{supplier.email}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600"><a className="hover:underline" href={`tel:${supplier.phone}`}>{supplier.phone}</a></td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600"><a className="hover:underline" href={`mailto:${supplier.email}`}>{supplier.email}</a></td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{supplier.address}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${supplier.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
@@ -332,7 +445,17 @@ export function Suppliers() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">৳{supplier.balance.toLocaleString()}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button onClick={() => handleEdit(supplier)} className="text-blue-600 hover:text-blue-900">Edit</button>
+                    <div className="inline-flex items-center gap-2">
+                      <a title="Call" href={`tel:${supplier.phone}`} className="p-2 rounded hover:bg-gray-100 text-gray-500 hover:text-gray-700">
+                        <Phone className="w-4 h-4" />
+                      </a>
+                      <a title="Email" href={`mailto:${supplier.email}`} className="p-2 rounded hover:bg-gray-100 text-gray-500 hover:text-gray-700">
+                        <Mail className="w-4 h-4" />
+                      </a>
+                      <button title="Edit" onClick={() => handleEdit(supplier)} className="p-2 rounded hover:bg-gray-100 text-blue-600 hover:text-blue-700">
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -349,8 +472,8 @@ export function Suppliers() {
       {/* Pagination */}
       <div className="flex flex-col sm:flex-row items-center justify-between mt-4 gap-3">
         <div className="text-sm text-gray-600">
-          Showing {(filteredSuppliers.length === 0 ? 0 : (currentPage - 1) * pageSize + 1)}-
-          {Math.min(currentPage * pageSize, filteredSuppliers.length)} of {filteredSuppliers.length}
+          Showing {(sortedSuppliers.length === 0 ? 0 : (currentPage - 1) * pageSize + 1)}-
+          {Math.min(currentPage * pageSize, sortedSuppliers.length)} of {sortedSuppliers.length}
         </div>
         <div className="flex items-center gap-3">
           <label className="text-sm text-gray-600">Per page</label>
