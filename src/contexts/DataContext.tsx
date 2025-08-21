@@ -9,6 +9,16 @@ export interface Supplier {
   email: string;
   balance: number;
   status: 'active' | 'inactive';
+  openingBalance: number;
+  creditLimit: number;
+  supplierCode?: string;
+  binVat?: string; // Bangladesh VAT/BIN
+  tin?: string;    // Tax Identification Number
+  paymentTerms?: string;
+  city?: string;
+  district?: string;
+  postalCode?: string;
+  notes?: string;
 }
 
 export interface PurchaseOrder {
@@ -126,9 +136,58 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 // Demo data
 const DEMO_SUPPLIERS: Supplier[] = [
-  { id: '1', name: 'Narayanganj Rice Mills', contact: 'Md. Rahman', address: 'Narayanganj, Dhaka', phone: '+8801712345678', email: 'rahman@nricemills.com', balance: 125000, status: 'active' },
-  { id: '2', name: 'Chattogram Grains', contact: 'Abdul Karim', address: 'Agrabad, Chattogram', phone: '+8801812345678', email: 'karim@ctggrains.com', balance: 85000, status: 'active' },
-  { id: '3', name: 'Sylhet Rice Traders', contact: 'Shahidul Islam', address: 'Zindabazar, Sylhet', phone: '+8801912345678', email: 'shahidul@sylhetrice.com', balance: 45000, status: 'active' },
+  {
+    id: '1',
+    name: 'Narayanganj Rice Mills',
+    contact: 'Md. Rahman',
+    address: 'Narayanganj, Dhaka',
+    phone: '+8801712345678',
+    email: 'rahman@nricemills.com',
+    balance: 125000,
+    status: 'active',
+    openingBalance: 125000,
+    creditLimit: 500000,
+    binVat: '001234567-0101',
+    tin: '1234567890',
+    paymentTerms: 'Net 15',
+    city: 'Narayanganj',
+    district: 'Dhaka',
+    postalCode: '1400'
+  },
+  {
+    id: '2',
+    name: 'Chattogram Grains',
+    contact: 'Abdul Karim',
+    address: 'Agrabad, Chattogram',
+    phone: '+8801812345678',
+    email: 'karim@ctggrains.com',
+    balance: 85000,
+    status: 'active',
+    openingBalance: 85000,
+    creditLimit: 350000,
+    binVat: '009876543-0202',
+    tin: '9876543210',
+    paymentTerms: 'Net 30',
+    city: 'Chattogram',
+    district: 'Chattogram',
+    postalCode: '4000'
+  },
+  {
+    id: '3',
+    name: 'Sylhet Rice Traders',
+    contact: 'Shahidul Islam',
+    address: 'Zindabazar, Sylhet',
+    phone: '+8801912345678',
+    email: 'shahidul@sylhetrice.com',
+    balance: 45000,
+    status: 'active',
+    openingBalance: 45000,
+    creditLimit: 250000,
+    paymentTerms: 'Advance',
+    city: 'Sylhet',
+    district: 'Sylhet',
+    postalCode: '3100'
+  },
 ];
 
 const DEMO_CUSTOMERS: Customer[] = [
