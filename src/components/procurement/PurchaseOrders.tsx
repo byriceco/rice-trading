@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Plus, Search, Filter, Edit2, Eye } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Plus, Search, Filter, Edit2, Eye, Download, CheckCircle } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
 import type { PurchaseOrder } from '../../contexts/DataContext';
 
@@ -8,8 +8,14 @@ export function PurchaseOrders() {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [paymentFilter, setPaymentFilter] = useState<'all' | 'pending' | 'partial' | 'paid'>('all');
+  const [sortKey, setSortKey] = useState<'date_desc' | 'amount_desc' | 'supplier_asc'>('date_desc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [editingOrder, setEditingOrder] = useState<PurchaseOrder | null>(null);
   const [viewingOrder, setViewingOrder] = useState<PurchaseOrder | null>(null);
+  const [payingOrder, setPayingOrder] = useState<PurchaseOrder | null>(null);
+  const [payAmount, setPayAmount] = useState<number>(0);
 
   const [formData, setFormData] = useState({
     supplierId: '',
@@ -35,12 +41,47 @@ export function PurchaseOrders() {
     'Other': ['Grade A', 'Grade B']
   };
 
-  const filteredOrders = purchaseOrders.filter(order => {
-    const matchesSearch = order.supplierName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.riceType.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  const filteredOrders = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+    return purchaseOrders
+      .filter(order =>
+        order.supplierName.toLowerCase().includes(term) ||
+        order.riceType.toLowerCase().includes(term)
+      )
+      .filter(order => (statusFilter === 'all' ? true : order.status === statusFilter))
+      .filter(order => (paymentFilter === 'all' ? true : order.paymentStatus === paymentFilter));
+  }, [purchaseOrders, searchTerm, statusFilter, paymentFilter]);
+
+  const sortedOrders = useMemo(() => {
+    const copy = [...filteredOrders];
+    switch (sortKey) {
+      case 'amount_desc':
+        copy.sort((a, b) => (b.totalAmount || 0) - (a.totalAmount || 0));
+        break;
+      case 'supplier_asc':
+        copy.sort((a, b) => a.supplierName.localeCompare(b.supplierName));
+        break;
+      case 'date_desc':
+      default:
+        copy.sort((a, b) => b.date.localeCompare(a.date));
+        break;
+    }
+    return copy;
+  }, [filteredOrders, sortKey]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedOrders.length / pageSize));
+  const paginatedOrders = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return sortedOrders.slice(start, start + pageSize);
+  }, [sortedOrders, currentPage, pageSize]);
+
+  const stats = useMemo(() => {
+    const totalAmount = sortedOrders.reduce((s, o) => s + (o.totalAmount || 0), 0);
+    const receivedCount = sortedOrders.filter(o => o.status === 'received').length;
+    const pendingCount = sortedOrders.filter(o => o.status === 'pending').length;
+    const payables = sortedOrders.reduce((s, o) => s + Math.max((o.totalAmount || 0) - (o.paidAmount || 0), 0), 0);
+    return { totalAmount, receivedCount, pendingCount, payables };
+  }, [sortedOrders]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,6 +139,52 @@ export function PurchaseOrders() {
     setShowForm(true);
   };
 
+  const openPaymentModal = (order: PurchaseOrder) => {
+    setPayingOrder(order);
+    const due = Math.max((order.totalAmount || 0) - (order.paidAmount || 0), 0);
+    setPayAmount(due);
+  };
+
+  const submitPayment = () => {
+    if (!payingOrder) return;
+    const newPaid = (payingOrder.paidAmount || 0) + payAmount;
+    const paymentStatus = newPaid >= (payingOrder.totalAmount || 0) ? 'paid' : (newPaid > 0 ? 'partial' : 'pending');
+    updatePurchaseOrder(payingOrder.id, { paidAmount: newPaid, paymentStatus });
+    setPayingOrder(null);
+    setPayAmount(0);
+  };
+
+  const markReceived = (order: PurchaseOrder) => {
+    if (order.status !== 'received') {
+      updatePurchaseOrder(order.id, { status: 'received' });
+    }
+  };
+
+  const exportCSV = () => {
+    const header = ['Date', 'Supplier', 'Rice Type', 'Grade', 'Qty(bags)', 'BagSize(kg)', 'Weight(kg)', 'Price/kg', 'Total', 'Status', 'Payment'];
+    const rows = sortedOrders.map(o => [
+      o.date,
+      o.supplierName,
+      o.riceType,
+      o.grade,
+      o.quantity,
+      o.bagSize,
+      o.weightKg,
+      o.pricePerKg,
+      o.totalAmount,
+      o.status,
+      o.paymentStatus,
+    ]);
+    const csv = [header, ...rows].map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `purchase-orders.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return 'bg-yellow-100 text-yellow-800';
@@ -113,13 +200,18 @@ export function PurchaseOrders() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">Purchase Orders</h1>
-        <button
-          onClick={() => setShowForm(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Create Purchase Order
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={exportCSV} className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center text-sm">
+            <Download className="w-4 h-4 mr-2" /> Export CSV
+          </button>
+          <button
+            onClick={() => setShowForm(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Create Purchase Order
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -147,7 +239,46 @@ export function PurchaseOrders() {
               <option value="received">Received</option>
               <option value="cancelled">Cancelled</option>
             </select>
+            <select
+              value={paymentFilter}
+              onChange={(e) => setPaymentFilter(e.target.value as any)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Payments</option>
+              <option value="pending">Payment Pending</option>
+              <option value="partial">Partial</option>
+              <option value="paid">Paid</option>
+            </select>
+            <select
+              value={sortKey}
+              onChange={(e) => { setSortKey(e.target.value as any); setCurrentPage(1); }}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="date_desc">Sort: Date (newest)</option>
+              <option value="amount_desc">Sort: Amount (high→low)</option>
+              <option value="supplier_asc">Sort: Supplier (A–Z)</option>
+            </select>
           </div>
+        </div>
+      </div>
+
+      {/* Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <p className="text-sm text-gray-600">Total Amount</p>
+          <p className="text-2xl font-bold text-gray-900">৳{stats.totalAmount.toLocaleString()}</p>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <p className="text-sm text-gray-600">Payables (Due)</p>
+          <p className="text-2xl font-bold text-red-600">৳{stats.payables.toLocaleString()}</p>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <p className="text-sm text-gray-600">Received</p>
+          <p className="text-2xl font-bold text-green-600">{stats.receivedCount}</p>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <p className="text-sm text-gray-600">Pending</p>
+          <p className="text-2xl font-bold text-orange-600">{stats.pendingCount}</p>
         </div>
       </div>
 
@@ -338,6 +469,48 @@ export function PurchaseOrders() {
         </div>
       )}
 
+      {/* Payment Modal */}
+      {payingOrder && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-sm">
+            <h2 className="text-lg font-semibold mb-4">Record Payment</h2>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Supplier</span>
+                <span className="font-medium text-gray-900">{payingOrder.supplierName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Total</span>
+                <span className="font-medium text-gray-900">৳{(payingOrder.totalAmount || 0).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Paid</span>
+                <span className="font-medium text-gray-900">৳{(payingOrder.paidAmount || 0).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Due</span>
+                <span className="font-medium text-red-600">৳{Math.max((payingOrder.totalAmount || 0) - (payingOrder.paidAmount || 0), 0).toLocaleString()}</span>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Receive Amount (৳)</label>
+                <input
+                  type="number"
+                  value={payAmount}
+                  onChange={(e) => setPayAmount(Number(e.target.value))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  min={0}
+                  max={Math.max((payingOrder.totalAmount || 0) - (payingOrder.paidAmount || 0), 0)}
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-4">
+              <button onClick={() => setPayingOrder(null)} className="px-3 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
+              <button onClick={submitPayment} className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700">Save Payment</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Orders Table */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
@@ -362,7 +535,7 @@ export function PurchaseOrders() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredOrders.map((order) => (
+              {paginatedOrders.map((order) => (
                 <tr key={order.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
@@ -407,12 +580,48 @@ export function PurchaseOrders() {
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
+                      <button
+                        onClick={() => openPaymentModal(order)}
+                        className="text-green-600 hover:text-green-800"
+                        title="Record Payment"
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                      </button>
+                      {order.status !== 'received' && (
+                        <button
+                          onClick={() => markReceived(order)}
+                          className="text-orange-600 hover:text-orange-800"
+                          title="Mark Received"
+                        >
+                          Received
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex items-center justify-between mt-4">
+        <div className="text-sm text-gray-600">
+          Showing {sortedOrders.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}-{Math.min(currentPage * pageSize, sortedOrders.length)} of {sortedOrders.length}
+        </div>
+        <div className="flex items-center gap-3">
+          <label className="text-sm text-gray-600">Per page</label>
+          <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }} className="px-2 py-1 border border-gray-300 rounded">
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+          </select>
+          <div className="flex items-center border border-gray-300 rounded overflow-hidden">
+            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} className="px-3 py-1 text-sm disabled:opacity-50" disabled={currentPage <= 1}>Prev</button>
+            <span className="px-3 py-1 text-sm text-gray-700">{currentPage} / {totalPages}</span>
+            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} className="px-3 py-1 text-sm disabled:opacity-50" disabled={currentPage >= totalPages}>Next</button>
+          </div>
         </div>
       </div>
 
