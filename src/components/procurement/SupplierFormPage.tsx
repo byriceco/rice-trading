@@ -8,7 +8,6 @@ export function SupplierFormPage() {
 
   const [formData, setFormData] = useState({
     name: '',
-    supplierCode: '',
     contact: '',
     phone: '',
     email: '',
@@ -25,10 +24,16 @@ export function SupplierFormPage() {
     status: 'active' as 'active' | 'inactive',
   });
 
+  const generateSupplierCode = () => {
+    const random = Math.floor(Math.random() * 10000);
+    return `SUP-${String(random).padStart(4, '0')}`;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     addSupplier({
       ...formData,
+      supplierCode: generateSupplierCode(),
       balance: formData.openingBalance,
     });
     navigate('/suppliers');
@@ -47,12 +52,12 @@ export function SupplierFormPage() {
             <h3 className="text-sm font-semibold text-gray-700">Basic Info</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Code (optional)</label>
-                <input type="text" value={formData.supplierCode} onChange={(e) => setFormData({ ...formData, supplierCode: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="e.g. SUP-0001" />
-              </div>
-              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Name<span className="text-red-500">*</span></label>
                 <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Generated Code</label>
+                <input type="text" value="Will be generated" className="w-full px-3 py-2 border border-dashed border-gray-300 rounded-lg bg-gray-50 text-gray-500" disabled />
               </div>
             </div>
             <div>
@@ -70,8 +75,8 @@ export function SupplierFormPage() {
                 <p className="text-xs text-gray-500 mt-1">Bangladesh format preferred (e.g., +8801...)</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email<span className="text-red-500">*</span></label>
-                <input type="email" placeholder="name@example.com" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required />
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" placeholder="name@example.com" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
               </div>
             </div>
           </section>
