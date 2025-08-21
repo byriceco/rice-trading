@@ -12,6 +12,9 @@ import { StockTransfers } from './components/inventory/StockTransfers';
 import { Customers } from './components/sales/Customers';
 import { SalesOrders } from './components/sales/SalesOrders';
 import { Finance } from './components/finance/Finance';
+import { ProductList } from './components/products/ProductList';
+import { BrandList } from './components/products/BrandList';
+import { CategoryList } from './components/products/CategoryList';
 import { Logistics } from './components/logistics/Logistics';
 import { Reports } from './components/reports/Reports';
 import { UserManagement } from './components/admin/UserManagement';
@@ -49,6 +52,9 @@ function AppContent() {
               <Route path="/customers" element={<Customers />} />
               <Route path="/sales-orders" element={<SalesOrders />} />
               <Route path="/finance" element={<Finance />} />
+              <Route path="/products" element={<ProductList />} />
+              <Route path="/brands" element={<BrandList />} />
+              <Route path="/categories" element={<CategoryList />} />
               <Route path="/logistics" element={<Logistics />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/users" element={<UserManagement />} />

@@ -12,6 +12,8 @@ import {
   Truck,
   BarChart3,
   Settings,
+  Tags,
+  LayoutGrid,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
@@ -37,6 +39,9 @@ const navItems: NavItem[] = [
   { name: 'Customers', path: '/customers', icon: UserCheck, permission: 'customers' },
   { name: 'Sales Orders', path: '/sales-orders', icon: Receipt, permission: 'sales_orders' },
   { name: 'Finance', path: '/finance', icon: DollarSign, permission: 'finance' },
+  { name: 'Products', path: '/products', icon: Package, permission: 'inventory' },
+  { name: 'Brands', path: '/brands', icon: Tags, permission: 'inventory' },
+  { name: 'Categories', path: '/categories', icon: LayoutGrid, permission: 'inventory' },
   { name: 'Logistics', path: '/logistics', icon: Truck, permission: 'logistics' },
   { name: 'Reports', path: '/reports', icon: BarChart3, permission: 'reports' },
   { name: 'User Management', path: '/users', icon: Settings, permission: 'all' },
