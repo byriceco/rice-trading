@@ -152,7 +152,7 @@ export function Customers() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Credit Limit (₹)
+                  Credit Limit (৳)
                 </label>
                 <input
                   type="number"
@@ -243,13 +243,13 @@ export function Customers() {
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Outstanding Balance</span>
                   <span className="font-semibold text-lg text-red-600">
-                    ₹{customer.balance.toLocaleString()}
+                    ৳{customer.balance.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Credit Limit</span>
                   <span className="font-semibold text-gray-900">
-                    ₹{customer.creditLimit.toLocaleString()}
+                    ৳{customer.creditLimit.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">

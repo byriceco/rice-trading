@@ -195,7 +195,7 @@ export function Logistics() {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Cost:</span>
-                          <span className="font-medium">₹{trip.cost.toLocaleString()}</span>
+                          <span className="font-medium">৳{trip.cost.toLocaleString()}</span>
                         </div>
                       </div>
                     </div>

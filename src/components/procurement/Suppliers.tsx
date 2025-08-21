@@ -214,7 +214,7 @@ export function Suppliers() {
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Outstanding Balance</span>
                 <span className="font-semibold text-lg text-red-600">
-                  ₹{supplier.balance.toLocaleString()}
+                  ৳{supplier.balance.toLocaleString()}
                 </span>
               </div>
             </div>

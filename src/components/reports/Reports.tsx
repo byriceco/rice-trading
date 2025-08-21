@@ -61,13 +61,13 @@ export function Reports() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-blue-50 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-blue-900 mb-2">Total Sales</h3>
-          <p className="text-3xl font-bold text-blue-600">₹{totalSales.toLocaleString()}</p>
+          <p className="text-3xl font-bold text-blue-600">৳{totalSales.toLocaleString()}</p>
           <p className="text-sm text-blue-700 mt-1">{filteredSalesOrders.length} orders</p>
         </div>
         <div className="bg-green-50 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-green-900 mb-2">Average Order Value</h3>
           <p className="text-3xl font-bold text-green-600">
-            ₹{filteredSalesOrders.length > 0 ? Math.round(totalSales / filteredSalesOrders.length).toLocaleString() : 0}
+            ৳{filteredSalesOrders.length > 0 ? Math.round(totalSales / filteredSalesOrders.length).toLocaleString() : 0}
           </p>
         </div>
         <div className="bg-purple-50 rounded-lg p-6">
@@ -86,7 +86,7 @@ export function Reports() {
               .map(([customer, amount]) => (
                 <div key={customer} className="flex justify-between items-center">
                   <span className="text-gray-700">{customer}</span>
-                  <span className="font-semibold text-gray-900">₹{amount.toLocaleString()}</span>
+                  <span className="font-semibold text-gray-900">৳{amount.toLocaleString()}</span>
                 </div>
               ))}
           </div>
@@ -101,7 +101,7 @@ export function Reports() {
               .map(([riceType, amount]) => (
                 <div key={riceType} className="flex justify-between items-center">
                   <span className="text-gray-700">{riceType}</span>
-                  <span className="font-semibold text-gray-900">₹{amount.toLocaleString()}</span>
+                  <span className="font-semibold text-gray-900">৳{amount.toLocaleString()}</span>
                 </div>
               ))}
           </div>
@@ -115,13 +115,13 @@ export function Reports() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-orange-50 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-orange-900 mb-2">Total Purchases</h3>
-          <p className="text-3xl font-bold text-orange-600">₹{totalPurchases.toLocaleString()}</p>
+          <p className="text-3xl font-bold text-orange-600">৳{totalPurchases.toLocaleString()}</p>
           <p className="text-sm text-orange-700 mt-1">{filteredPurchaseOrders.length} orders</p>
         </div>
         <div className="bg-red-50 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-red-900 mb-2">Average Purchase Value</h3>
           <p className="text-3xl font-bold text-red-600">
-            ₹{filteredPurchaseOrders.length > 0 ? Math.round(totalPurchases / filteredPurchaseOrders.length).toLocaleString() : 0}
+            ৳{filteredPurchaseOrders.length > 0 ? Math.round(totalPurchases / filteredPurchaseOrders.length).toLocaleString() : 0}
           </p>
         </div>
         <div className="bg-indigo-50 rounded-lg p-6">
@@ -138,7 +138,7 @@ export function Reports() {
             .map(([supplier, amount]) => (
               <div key={supplier} className="flex justify-between items-center">
                 <span className="text-gray-700">{supplier}</span>
-                <span className="font-semibold text-gray-900">₹{amount.toLocaleString()}</span>
+                <span className="font-semibold text-gray-900">৳{amount.toLocaleString()}</span>
               </div>
             ))}
         </div>
@@ -162,7 +162,7 @@ export function Reports() {
         <div className="bg-emerald-50 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-emerald-900 mb-2">Total Value</h3>
           <p className="text-3xl font-bold text-emerald-600">
-            ₹{inventory.reduce((sum, item) => sum + (item.weightKg * item.costPerKg), 0).toLocaleString()}
+            ৳{inventory.reduce((sum, item) => sum + (item.weightKg * item.costPerKg), 0).toLocaleString()}
           </p>
         </div>
       </div>
@@ -174,7 +174,7 @@ export function Reports() {
             {Object.entries(inventoryByWarehouse).map(([warehouse, value]) => (
               <div key={warehouse} className="flex justify-between items-center">
                 <span className="text-gray-700">{warehouse}</span>
-                <span className="font-semibold text-gray-900">₹{value.toLocaleString()}</span>
+                <span className="font-semibold text-gray-900">৳{value.toLocaleString()}</span>
               </div>
             ))}
           </div>
@@ -207,16 +207,16 @@ export function Reports() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-green-50 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-green-900 mb-2">Total Income</h3>
-          <p className="text-3xl font-bold text-green-600">₹{totalIncome.toLocaleString()}</p>
+          <p className="text-3xl font-bold text-green-600">৳{totalIncome.toLocaleString()}</p>
         </div>
         <div className="bg-red-50 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-red-900 mb-2">Total Expenses</h3>
-          <p className="text-3xl font-bold text-red-600">₹{totalExpenses.toLocaleString()}</p>
+          <p className="text-3xl font-bold text-red-600">৳{totalExpenses.toLocaleString()}</p>
         </div>
         <div className="bg-blue-50 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-blue-900 mb-2">Net Profit</h3>
           <p className={`text-3xl font-bold ${(totalIncome - totalExpenses) >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
-            ₹{(totalIncome - totalExpenses).toLocaleString()}
+            ৳{(totalIncome - totalExpenses).toLocaleString()}
           </p>
         </div>
         <div className="bg-purple-50 rounded-lg p-6">
@@ -238,7 +238,7 @@ export function Reports() {
               .map((customer) => (
                 <div key={customer.id} className="flex justify-between items-center">
                   <span className="text-gray-700">{customer.name}</span>
-                  <span className="font-semibold text-green-600">₹{customer.balance.toLocaleString()}</span>
+                  <span className="font-semibold text-green-600">৳{customer.balance.toLocaleString()}</span>
                 </div>
               ))}
             {customers.filter(c => c.balance > 0).length === 0 && (
@@ -257,7 +257,7 @@ export function Reports() {
               .map((supplier) => (
                 <div key={supplier.id} className="flex justify-between items-center">
                   <span className="text-gray-700">{supplier.name}</span>
-                  <span className="font-semibold text-red-600">₹{supplier.balance.toLocaleString()}</span>
+                  <span className="font-semibold text-red-600">৳{supplier.balance.toLocaleString()}</span>
                 </div>
               ))}
             {suppliers.filter(s => s.balance > 0).length === 0 && (

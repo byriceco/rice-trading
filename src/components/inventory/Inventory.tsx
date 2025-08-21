@@ -120,7 +120,7 @@ export function Inventory() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Value</p>
-              <p className="text-2xl font-bold text-gray-900">₹{totalValue.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-gray-900">৳{totalValue.toLocaleString()}</p>
             </div>
             <Package className="w-8 h-8 text-purple-600" />
           </div>
@@ -258,7 +258,7 @@ export function Inventory() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Cost per kg (₹)
+                  Cost per kg (৳)
                 </label>
                 <input
                   type="number"
@@ -344,9 +344,9 @@ export function Inventory() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm text-gray-900">₹{item.costPerKg}/kg</div>
+                      <div className="text-sm text-gray-900">৳{item.costPerKg}/kg</div>
                       <div className="text-sm font-medium text-gray-900">
-                        ₹{(item.weightKg * item.costPerKg).toLocaleString()}
+                        ৳{(item.weightKg * item.costPerKg).toLocaleString()}
                       </div>
                     </div>
                   </td>

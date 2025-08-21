@@ -261,7 +261,7 @@ export function PurchaseOrders() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Price per kg (₹)
+                    Price per kg (৳)
                   </label>
                   <input
                     type="number"
@@ -276,7 +276,7 @@ export function PurchaseOrders() {
               
               <div className="bg-gray-50 p-4 rounded-lg">
                 <div className="text-lg font-semibold text-gray-900">
-                  Total Amount: ₹{(formData.weightKg * formData.pricePerKg).toLocaleString()}
+                  Total Amount: ৳{(formData.weightKg * formData.pricePerKg).toLocaleString()}
                 </div>
               </div>
 
@@ -312,8 +312,8 @@ export function PurchaseOrders() {
               <div><span className="font-medium">Rice Type:</span> {viewingOrder.riceType} - {viewingOrder.grade}</div>
               <div><span className="font-medium">Quantity:</span> {viewingOrder.quantity} bags ({viewingOrder.bagSize}kg each)</div>
               <div><span className="font-medium">Total Weight:</span> {viewingOrder.weightKg} kg</div>
-              <div><span className="font-medium">Price per kg:</span> ₹{viewingOrder.pricePerKg}</div>
-              <div><span className="font-medium">Total Amount:</span> ₹{viewingOrder.totalAmount.toLocaleString()}</div>
+              <div><span className="font-medium">Price per kg:</span> ৳{viewingOrder.pricePerKg}</div>
+              <div><span className="font-medium">Total Amount:</span> ৳{viewingOrder.totalAmount.toLocaleString()}</div>
               <div><span className="font-medium">Status:</span> 
                 <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(viewingOrder.status)}`}>
                   {viewingOrder.status}
@@ -324,7 +324,7 @@ export function PurchaseOrders() {
                   {viewingOrder.paymentStatus}
                 </span>
               </div>
-              <div><span className="font-medium">Paid Amount:</span> ₹{viewingOrder.paidAmount.toLocaleString()}</div>
+              <div><span className="font-medium">Paid Amount:</span> ৳{viewingOrder.paidAmount.toLocaleString()}</div>
             </div>
             <div className="flex justify-end mt-6">
               <button
@@ -379,8 +379,8 @@ export function PurchaseOrders() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
                       <div className="text-sm text-gray-900">{order.quantity} bags × {order.bagSize}kg</div>
-                      <div className="text-sm text-gray-500">₹{order.pricePerKg}/kg</div>
-                      <div className="text-sm font-medium text-gray-900">₹{order.totalAmount.toLocaleString()}</div>
+                      <div className="text-sm text-gray-500">৳{order.pricePerKg}/kg</div>
+                      <div className="text-sm font-medium text-gray-900">৳{order.totalAmount.toLocaleString()}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

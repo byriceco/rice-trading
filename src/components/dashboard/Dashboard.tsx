@@ -26,7 +26,7 @@ export function Dashboard() {
   const metrics = [
     {
       title: 'Total Inventory Value',
-      value: `₹${totalInventoryValue.toLocaleString()}`,
+      value: `৳${totalInventoryValue.toLocaleString()}`,
       change: '+12.5%',
       trend: 'up',
       icon: Package,
@@ -34,7 +34,7 @@ export function Dashboard() {
     },
     {
       title: 'Total Sales',
-      value: `₹${totalSales.toLocaleString()}`,
+      value: `৳${totalSales.toLocaleString()}`,
       change: '+8.2%',
       trend: 'up',
       icon: Receipt,
@@ -50,7 +50,7 @@ export function Dashboard() {
     },
     {
       title: 'Pending Receivables',
-      value: `₹${pendingReceivables.toLocaleString()}`,
+      value: `৳${pendingReceivables.toLocaleString()}`,
       change: '-5.1%',
       trend: 'down',
       icon: DollarSign,
@@ -191,7 +191,7 @@ export function Dashboard() {
                   <p className={`font-medium ${
                     transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
                   }`}>
-                    {transaction.type === 'income' ? '+' : '-'}₹{transaction.amount.toLocaleString()}
+                  {transaction.type === 'income' ? '+' : '-'}৳{transaction.amount.toLocaleString()}
                   </p>
                   <p className="text-sm text-gray-500">{transaction.date}</p>
                 </div>

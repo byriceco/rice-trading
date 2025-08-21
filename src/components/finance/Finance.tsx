@@ -66,7 +66,7 @@ export function Finance() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Income</p>
-              <p className="text-2xl font-bold text-green-600">₹{totalIncome.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-green-600">৳{totalIncome.toLocaleString()}</p>
             </div>
             <TrendingUp className="w-8 h-8 text-green-600" />
           </div>
@@ -75,7 +75,7 @@ export function Finance() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Expenses</p>
-              <p className="text-2xl font-bold text-red-600">₹{totalExpenses.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-red-600">৳{totalExpenses.toLocaleString()}</p>
             </div>
             <TrendingDown className="w-8 h-8 text-red-600" />
           </div>
@@ -85,7 +85,7 @@ export function Finance() {
             <div>
               <p className="text-sm font-medium text-gray-600">Net Profit</p>
               <p className={`text-2xl font-bold ${netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                ₹{netProfit.toLocaleString()}
+                ৳{netProfit.toLocaleString()}
               </p>
             </div>
             <DollarSign className={`w-8 h-8 ${netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`} />
@@ -96,7 +96,7 @@ export function Finance() {
             <div>
               <p className="text-sm font-medium text-gray-600">Cash Flow</p>
               <p className={`text-2xl font-bold ${(totalReceivables - totalPayables) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                ₹{(totalReceivables - totalPayables).toLocaleString()}
+                ৳{(totalReceivables - totalPayables).toLocaleString()}
               </p>
             </div>
             <Wallet className="w-8 h-8 text-blue-600" />
@@ -138,7 +138,7 @@ export function Finance() {
                   <div className="space-y-3">
                     <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                       <span className="text-gray-600">Total Receivables</span>
-                      <span className="font-semibold text-green-600">₹{totalReceivables.toLocaleString()}</span>
+                      <span className="font-semibold text-green-600">৳{totalReceivables.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                       <span className="text-gray-600">Active Customers</span>
@@ -151,7 +151,7 @@ export function Finance() {
                   <div className="space-y-3">
                     <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                       <span className="text-gray-600">Total Payables</span>
-                      <span className="font-semibold text-red-600">₹{totalPayables.toLocaleString()}</span>
+                      <span className="font-semibold text-red-600">৳{totalPayables.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                       <span className="text-gray-600">Active Suppliers</span>
@@ -185,7 +185,7 @@ export function Finance() {
                         <p className={`font-semibold ${
                           transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
                         }`}>
-                          {transaction.type === 'income' ? '+' : '-'}₹{transaction.amount.toLocaleString()}
+                          {transaction.type === 'income' ? '+' : '-'}৳{transaction.amount.toLocaleString()}
                         </p>
                         {transaction.reference && (
                           <p className="text-sm text-gray-500">{transaction.reference}</p>
@@ -209,8 +209,8 @@ export function Finance() {
                       <p className="text-sm text-gray-500">{customer.contact}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-green-600">₹{customer.balance.toLocaleString()}</p>
-                      <p className="text-sm text-gray-500">Credit Limit: ₹{customer.creditLimit.toLocaleString()}</p>
+                      <p className="font-semibold text-green-600">৳{customer.balance.toLocaleString()}</p>
+                      <p className="text-sm text-gray-500">Credit Limit: ৳{customer.creditLimit.toLocaleString()}</p>
                     </div>
                   </div>
                 ))}
@@ -232,7 +232,7 @@ export function Finance() {
                       <p className="text-sm text-gray-500">{supplier.contact}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-red-600">₹{supplier.balance.toLocaleString()}</p>
+                      <p className="font-semibold text-red-600">৳{supplier.balance.toLocaleString()}</p>
                     </div>
                   </div>
                 ))}
