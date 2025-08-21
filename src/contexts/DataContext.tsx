@@ -126,9 +126,9 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 // Demo data
 const DEMO_SUPPLIERS: Supplier[] = [
-  { id: '1', name: 'Punjab Rice Mills', contact: 'Rajesh Kumar', address: 'Amritsar, Punjab', phone: '+91-9876543210', email: 'rajesh@punjabrice.com', balance: 125000, status: 'active' },
-  { id: '2', name: 'Haryana Grains', contact: 'Suresh Singh', address: 'Karnal, Haryana', phone: '+91-9876543211', email: 'suresh@haryanagrains.com', balance: 85000, status: 'active' },
-  { id: '3', name: 'UP Rice Traders', contact: 'Amit Sharma', address: 'Meerut, UP', phone: '+91-9876543212', email: 'amit@uprice.com', balance: 45000, status: 'active' },
+  { id: '1', name: 'Narayanganj Rice Mills', contact: 'Md. Rahman', address: 'Narayanganj, Dhaka', phone: '+8801712345678', email: 'rahman@nricemills.com', balance: 125000, status: 'active' },
+  { id: '2', name: 'Chattogram Grains', contact: 'Abdul Karim', address: 'Agrabad, Chattogram', phone: '+8801812345678', email: 'karim@ctggrains.com', balance: 85000, status: 'active' },
+  { id: '3', name: 'Sylhet Rice Traders', contact: 'Shahidul Islam', address: 'Zindabazar, Sylhet', phone: '+8801912345678', email: 'shahidul@sylhetrice.com', balance: 45000, status: 'active' },
 ];
 
 const DEMO_CUSTOMERS: Customer[] = [
